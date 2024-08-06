@@ -1,0 +1,59 @@
+<!-- feed.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News Feed</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container mt-3">
+        <h1>News Feed</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'post_article' %}" class="btn btn-primary mb-3">Post an Article</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary mb-3">Login to Post an Article</a>
+        {% endif %}
+        <div id="articles-container">
+            {% for article in articles %}
+            <div class="card mb-3 box">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h5>
+                    <p class="card-text">{{ article.description }}</p>
+                    <p class="card-text"><small class="text-muted">{{ article.published_at }}</small></p>
+                    <p class="card-text">Upvotes: <span id="upvotes-{{ article.id }}">{{ article.upvotes }}</span> | Downvotes: <span id="downvotes-{{ article.id }}">{{ article.downvotes }}</span></p>
+                    {% if user.is_authenticated %}
+                    <button class="btn btn-success" onclick="voteArticle({{ article.id }}, true)">Upvote</button>
+                    <button class="btn btn-danger" onclick="voteArticle({{ article.id }}, false)">Downvote</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+    function voteArticle(articleId, isUpvote) {
+        $.ajax({
+            url: '{% url "vote_article" %}',
+            method: 'POST',
+            data: {
+                'article_id': articleId,
+                'is_upvote': isUpvote,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    $('#upvotes-' + articleId).text(data.upvotes);
+                    $('#downvotes-' + articleId).text(data.downvotes);
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+    }
+    </script>
+</body>
+</html>

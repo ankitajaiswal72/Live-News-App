@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News App</title>
+    <style>
+        .news-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .news-item {
+            flex: 1 0 30%;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>News</h1>
+    <div class="news-container">
+        {% for article in news_articles %}
+            <div class="news-item">
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.content }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
